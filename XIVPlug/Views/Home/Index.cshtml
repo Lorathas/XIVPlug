@@ -1,0 +1,118 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<div id="app">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="pull-right">
+                <button v-bind:class="scannerButtonClass" v-on:click="toggleScanning">{{scannerButtonMessage}}</button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="text-center" v-if="devices.length === 0">
+                <span>No devices found. Start scanning to find devices and make sure they are powered on and discoverable.</span>
+            </div>
+            <div v-if="devices.length > 0">
+                <ul class="list-unstyled">
+                    <li v-for="device in devices">
+                        <h5>{{device.Name}}</h5>
+                        <button class="btn btn-primary" v-if="device === selectedDevice" v-on:click="deselectDevice(device)">Deselect</button>
+                        <button class="btn btn-default" v-if="device !== selectedDevice" v-on:click="selectDevice(device)">Select</button>
+                        <button class="btn btn-default" v-if="device === selectedDevice" v-on:click="testDevice">{{testButtonMessage}}</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script src="~/Scripts/axios.min.js"></script>
+    <script src="~/Scripts/vue-v2.6.10.js"></script>
+    <script>
+        let app = new Vue({
+            el: '#app',
+            data: {
+                isScanning: false,
+                devices: [],
+                _scannerUpdateId: null,
+                selectedDevice: null,
+                isTesting: false
+            },
+            computed: {
+                scannerButtonClass: function() {
+                    if (this.isScanning) {
+                        return 'btn btn-danger';
+                    } else {
+                        return 'btn btn-success';
+                    }
+                },
+                scannerButtonMessage: function() {
+                    return this.isScanning ? 'Stop Scanning' : 'Start Scanning';
+                },
+                testButtonMessage: function() {
+                    return this.isTesting ? 'Testing...' : 'Test';
+                }
+            },
+            methods: {
+                toggleScanning: function() {
+                    if (this.isScanning) {
+                        axios.post('/api/plugs/stopscanning').then(() => {
+                            this.isScanning = false;
+                        });
+
+                        if (this._scannerUpdateId !== null) {
+                            clearInterval(this._scannerUpdateId);
+                            this._scannerUpdateId = null;
+                        }
+                    } else {
+                        axios.post('/api/plugs/startscanning').then(() => {
+                            this.isScanning = true;
+                        });
+
+                        if (this._scannerUpdateId !== null) {
+                            clearInterval(this._scannerUpdateId);
+                            this._scannerUpdateId = null;
+                        }
+
+                        this._scannerUpdateId = setInterval(() => {
+                                axios.get('/api/plugs/list').then((response) => {
+                                    if (this.selectedDevice !== null) {
+                                        let matchingDevice = null;
+                                        for (let device of response.data) {
+                                            if (device.Name === this.selectedDevice.Name) {
+                                                this.selectedDevice = device;
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    this.devices = response.data;
+                                });
+                            },
+                            1000);
+                    }
+                },
+                selectDevice: function(device) {
+                    axios.post('/api/plugs/select', device).then(() => {
+                        this.selectedDevice = device;
+                    });
+                },
+                deselectDevice: function() {
+                    axios.post('/api/plugs/deselect').then(() => {
+                        this.selectedDevice = null;
+                    });
+                },
+                testDevice: function () {
+                    this.isTesting = true;
+                    axios.post('/api/plugs/test').then(() => {
+                        this.isTesting = false;
+                    });
+                }
+            }
+        });
+    </script>
+}
