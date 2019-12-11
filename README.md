@@ -20,4 +20,4 @@ or for multiple actions:
 [{ "Type": "Vibrate", "Value": 0.5, "DurationMillis": 500 }, { "Type": "Vibrate", "Value": 0.8, "DurationMillis": 500 }]
 ```
 
-To break it down quickly Value is the intesnity between 0 and 1, and duration millis is the duration in milliseconds to execute the command.
+To break it down quickly `Value` is the intesnity between 0 and 1, and `DurationMillis` is the duration in milliseconds to execute the command.
