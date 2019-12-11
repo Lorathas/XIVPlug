@@ -74,6 +74,25 @@ namespace XIVPlug
             worker.DoWork += ProcessQueueEvents;
         }
 
+        public void Enqueue(IEnumerable<Command> commands)
+        {
+            try
+            {
+                foreach (var command in commands)
+                {
+                    commandQueue.Enqueue(command);
+                }
+
+                if (!worker.IsBusy)
+                {
+                    worker.RunWorkerAsync();
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
         public void Enqueue(Command command)
         {
             try

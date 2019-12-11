@@ -149,6 +149,15 @@ namespace XIVPlug.Controllers
         }
 
         [HttpPost]
+        [Route("api/plugs/queueactions")]
+        public IHttpActionResult QueueActions([FromBody] List<Command> commands)
+        {
+            connection.Enqueue(commands);
+
+            return Ok();
+        }
+
+        [HttpPost]
         [Route("api/plugs/clearqueue")]
         public IHttpActionResult ClearQueue()
         {
