@@ -18,6 +18,18 @@ namespace XIVPlug
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            ErrorLog.GetInstance().Initialize(Server);
+        }
+
+        protected void Application_Error(object sender, EventArgs e)
+        {
+            var exception = Server.GetLastError();
+
+            if (exception != null)
+            {
+                ErrorLog.GetInstance().LogException(exception);
+            }
         }
     }
 }

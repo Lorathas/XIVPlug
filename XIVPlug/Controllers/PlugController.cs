@@ -13,6 +13,13 @@ namespace XIVPlug.Controllers
 {
     public class PlugController : ApiController
     {
+        private readonly ToyConnection connection;
+
+        public PlugController()
+        {
+            connection = ToyConnection.GetInstance();
+        }
+
         [HttpPost]
         [Route("api/plugs/set")]
         public void Set([FromBody] object value)
@@ -33,7 +40,7 @@ namespace XIVPlug.Controllers
         [Route("api/plugs/connect")]
         public async void Connect([FromBody] string name)
         {
-            var client = ToyConnection.GetInstance();
+            var client = connection.GetClientInstance();
 
             if (!client.Connected)
             {
@@ -47,7 +54,7 @@ namespace XIVPlug.Controllers
         [Route("api/plugs/startscanning")]
         public async Task<IHttpActionResult> StartScanning()
         {
-            var client = ToyConnection.GetInstance();
+            var client = connection.GetClientInstance();
 
             if (!client.Connected)
             {
@@ -70,7 +77,7 @@ namespace XIVPlug.Controllers
         [Route("api/plugs/stopscanning")]
         public async Task<IHttpActionResult> StopScanning()
         {
-            var client = ToyConnection.GetInstance();
+            var client = connection.GetClientInstance();
 
             if (!client.Connected)
             {
@@ -93,7 +100,7 @@ namespace XIVPlug.Controllers
         [Route("api/plugs/list")]
         public async Task<IHttpActionResult> GetListOfDevices()
         {
-            var client = ToyConnection.GetInstance();
+            var client = connection.GetClientInstance();
 
             if (!client.Connected)
             {
@@ -107,7 +114,7 @@ namespace XIVPlug.Controllers
         [Route("api/plugs/select")]
         public async Task<IHttpActionResult> SelectDevice([FromBody] Device device)
         {
-            ToyConnection.SelectedDeviceName = device.Name;
+            connection.SelectedDeviceName = device.Name;
 
             return Ok();
         }
@@ -116,7 +123,7 @@ namespace XIVPlug.Controllers
         [Route("api/plugs/deselect")]
         public async Task<IHttpActionResult> DeselectDevice()
         {
-            ToyConnection.SelectedDeviceName = null;
+            connection.SelectedDeviceName = null;
 
             return Ok();
         }
@@ -125,9 +132,27 @@ namespace XIVPlug.Controllers
         [Route("api/plugs/test")]
         public async Task<IHttpActionResult> TestDevice()
         {
-            ToyConnection.SelectedDevice?.SendVibrateCmd(0.25);
+            connection.SelectedDevice?.SendVibrateCmd(0.125);
             Thread.Sleep(500);
-            ToyConnection.SelectedDevice?.SendVibrateCmd(0.0);
+            connection.SelectedDevice?.SendVibrateCmd(0.0);
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("api/plugs/queueaction")]
+        public IHttpActionResult QueueAction([FromBody] Command command)
+        {
+            connection.Enqueue(command);
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("api/plugs/clearqueue")]
+        public IHttpActionResult ClearQueue()
+        {
+            connection.ClearQueue();
 
             return Ok();
         }

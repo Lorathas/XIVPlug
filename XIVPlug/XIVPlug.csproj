@@ -135,9 +135,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
+    <!-- <Reference Include="Newtonsoft.Json"> -->
+    <!--   <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath> -->
+    <!-- </Reference> -->
     <Reference Include="System.Net.Http.Formatting">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.7\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
@@ -161,6 +161,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers.cs" />
+    <Compile Include="Logs.cs" />
+    <Compile Include="Models\Command.cs" />
+    <Compile Include="Models\CommandType.cs" />
     <Compile Include="Models\Device.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ToyConnection.cs" />
