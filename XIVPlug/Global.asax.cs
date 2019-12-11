@@ -31,5 +31,10 @@ namespace XIVPlug
                 ErrorLog.GetInstance().LogException(exception);
             }
         }
+
+        protected void Application_End(object sender, EventArgs e)
+        {
+            ToyConnection.GetInstance().ClearQueue();
+        }
     }
 }
